@@ -1,0 +1,33 @@
+workflow:
+  name: doc_classifier
+  description: Document classification pipeline with confidence monitoring
+
+classifier:
+  model: "openai/gpt-4o-mini"
+  confidence_threshold: 0.75
+  fallback_threshold: 0.50
+
+assumptions:
+  - name: low_confidence_rate
+    description: Fraction of classifications below confidence_threshold
+    max_rate: 0.15
+
+  - name: fallback_rate
+    description: Fraction below fallback_threshold
+    max_rate: 0.05
+
+  - name: throughput
+    description: Minimum documents processed per hour
+    min_value: 10
+
+monitoring:
+  window_size: 100
+  check_interval_seconds: 60
+
+notifications:
+  review_template: |
+    Document classification pipeline PAUSED.
+    Assumption: {assumption_name}
+    Reason: {reason}
+    Low-confidence rate: {low_conf_rate:.1%}
+    Total processed: {total}
