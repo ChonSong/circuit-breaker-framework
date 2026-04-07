@@ -1,0 +1,44 @@
+name: AI Code Review (PR-Agent)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      pr_url:
+        description: 'PR URL to review (e.g. https://github.com/ChonSong/repo-transmute/pull/123)'
+        required: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    name: AI Code Review
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PR-Agent
+        run: pip install pr-agent
+
+      - name: Run PR Review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${{ inputs.pr_url }}" ]; then
+            pr-agent review --pr_url="${{ inputs.pr_url }}"
+          elif [ -n "${{ github.event.comment.body }}" ]; then
+            pr-agent review --pr_url="${{ github.event.pull_request.html_url }}"
+          else
+            pr-agent review --pr_url="${{ github.event.pull_request.html_url }}"
+          fi
