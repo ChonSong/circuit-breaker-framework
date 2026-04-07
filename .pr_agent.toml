@@ -1,0 +1,37 @@
+# PR-Agent Configuration
+# Qodo Merge / PR-Agent settings for ChonSong repos
+
+[pr_reviewer]
+# Auto-trigger review when PR is opened/updated
+pr_commands = [
+    "/review",
+    "/describe",
+    "/improve",
+]
+
+# Focus on these areas during review
+extra_instructions = """
+- Focus on: correctness, security, performance, and maintainability
+- Look for: race conditions, memory leaks, SQL injection, hardcoded secrets
+- Ignore: generated files, lock files, minified JS, vendor/ dependencies
+- Prioritise: logic errors, missing error handling, API contract violations
+"""
+
+[pr_description]
+# Auto-update PR title and description
+validate = true
+auto_generate = true
+
+[pr_code_suggestions]
+# Code improvement suggestions
+num_code_suggestions = 5
+enable_negative_logging = false
+
+[pr_update_changelog]
+auto_generate = false
+
+[model]
+# Use these in order of preference. Set one via GITHUB SECRET (OPENAI_API_KEY or ANTHROPIC_API_KEY)
+provider = "openai"
+model = "gpt-4o"
+fallback_models = ["gpt-4o-mini", "claude-sonnet-4-20250514"]
