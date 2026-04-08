@@ -1,0 +1,26 @@
+# Oracle: Resource Exhaustion Monitor
+# Tracks token/minute burn against a fixed budget. Halts before budget depletes.
+name: resource_exhaustion_oracle
+description: >
+  Monitors cumulative token consumption against a configured maximum budget.
+  Emits warnings at 70% and 90%, and HALT at 100%.
+
+resource_budget_max: 100000
+resource_unit: tokens
+warning_levels:
+  - threshold: 0.70
+    action: WARN
+    message: "70% of resource budget consumed"
+  - threshold: 0.90
+    action: WARN
+    message: "90% of resource budget consumed - consider optimising"
+halt_on_exhaustion: true
+halt_reason: OPERATIONAL_EXHAUSTION
+
+recovery_actions:
+  - action: BUDGET_INCREASE
+    description: "Increase resource ceiling if task warrants it"
+  - action: OPTIMISE_PROMPT
+    description: "Reduce token usage via more concise prompting"
+  - action: OFFLOAD_CHEAPER
+    description: "Route non-critical subtasks to cheaper model"

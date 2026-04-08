@@ -1,0 +1,28 @@
+# Oracle: RAG Toxicity Monitor
+# Validates retrieval quality before generation. Halts if quality score < 60%.
+name: rag_toxicity_oracle
+description: >
+  Scores each RAG retrieval step using relevance, groundedness, and citation
+  accuracy. Surfaces a composite toxicity percentage. Halts if score < 60%.
+
+rag_toxicity_min: 60.0
+rag_toxicity_unit: percent
+scoring_components:
+  - relevance_score (weight: 0.4)
+  - groundedness_score (weight: 0.4)
+  - citation_accuracy (weight: 0.2)
+monitoring:
+  sampling_interval_seconds: 120
+  min_document_count: 5
+halt_on_low_quality: true
+halt_reason: RAG_TOXICITY_LOW
+
+recovery_actions:
+  - action: AUDIT_CORPUS
+    description: "Review retrieval corpus for outdated or irrelevant documents"
+  - action: IMPROVE_CHUNKING
+    description: "Re-chunk documents with better overlap and semantic boundaries"
+  - action: ADD_RERANKER
+    description: "Introduce a cross-encoder re-ranker to filter low-quality retrievals"
+  - action: UPDATE_EMBEDDINGS
+    description: "Re-index corpus with a stronger embedding model"

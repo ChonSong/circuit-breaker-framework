@@ -1,0 +1,23 @@
+# Oracle: Blast Radius Guard
+# Caps the number of records/units affected by any single orchestrator action.
+name: blast_radius_oracle
+description: >
+  Tracks the blast radius (affected record count, API scope, write surface)
+  per orchestrator task execution. Halts if actual radius exceeds the max.
+
+blast_radius_max: 100
+blast_radius_unit: records
+monitored_operations:
+  - bulk_classify
+  - batch_update
+  - bulk_delete
+halt_on_violation: true
+halt_reason: BLAST_RADIUS_VIOLATION
+
+recovery_actions:
+  - action: REDUCE_BATCH
+    description: "Lower batch size to stay within acceptable blast radius"
+  - action: CONTAINMENT_GUARD
+    description: "Add write filters to isolate high-impact operations"
+  - action: TIGHTEN_THRESHOLD
+    description: "Re-evaluate and lower blast_radius_max if operation is safe at smaller scale"

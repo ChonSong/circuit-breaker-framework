@@ -1,0 +1,24 @@
+# Oracle: Semantic Drift Monitor
+# Fires when output distributions diverge significantly from expected baselines.
+name: semantic_drift_oracle
+description: >
+  Monitors semantic drift by comparing embedding centroids between a reference
+  corpus and the live production output stream. Triggers HALT if cosine
+  distance >= 0.9.
+
+drift_threshold: 0.9
+embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+reference_corpus_path: "./data/reference_corpus.jsonl"
+sampling_interval_seconds: 300
+min_sample_size: 50
+
+halt_on_drift: true
+halt_reason: SEMANTIC_DRIFT
+
+recovery_actions:
+  - action: RETRAIN
+    description: "Retrain embedding model on recent production samples"
+  - action: NARROW_sCOPE
+    description: "Reduce task scope to reduce distributional surface"
+  - action: HUMAN_REVIEW
+    description: "Schedule expert review of recent outputs"
